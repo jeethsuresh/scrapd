@@ -179,12 +179,12 @@ def parse_twitter_description(twitter_description):
             fatality_date = ' '.join(fatality_date)
 
         # Turn it into a date object.
-        d[Fields.DATE] = date_utils.parse_date(fatality_date)
+        d[Fields.DATE] = fatality_date
 
     # Handle special case where Date of birth is a token `DOB:`.
     tmp_dob = d.get(Fields.DOB)
     if tmp_dob and isinstance(tmp_dob, list):
-        d[Fields.DOB] = date_utils.parse_date(tmp_dob[0])
+        d[Fields.DOB] = tmp_dob[0]
 
     return common_fatality_parsing(d)
 
@@ -482,7 +482,7 @@ def parse_deceased_field_common(split_deceased_field, fleg):
 
     # Extract and clean up DOB.
     raw_dob = split_deceased_field[-1].strip()
-    dob_guess = date_utils.parse_date(raw_dob)
+    dob_guess = raw_dob
     d[Fields.DOB] = date_utils.check_dob(dob_guess)
 
     return d
@@ -547,7 +547,7 @@ def parse_page_content(detail_page, notes_parsed=False):
     # Parse the `Date` field.
     date_field_str = parse_date_field(normalized_detail_page)
     if date_field_str:
-        d[Fields.DATE] = date_utils.parse_date(date_field_str)
+        d[Fields.DATE] = date_field_str
 
     # Parse the `Deceased` field.
     deceased_field_str = parse_deceased_field(normalized_detail_page)
@@ -625,7 +625,7 @@ def parse_date_field(page):
     )
     date = match_pattern(page, date_pattern).replace('.', ' ')
     date = search_dates(date)
-    return date[0][1].strftime("%m/%d/%Y") if date else ''
+    return date[0][1].date() if date else None
 
 
 def parse_deceased_field(page):
